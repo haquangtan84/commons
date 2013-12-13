@@ -1,4 +1,4 @@
-(function(jQuery,gtnbase){
+(function(CssIconFile, jQuery, gtnbase){
 	var _module = {};
 	
 /********** Document Selector ***********/
@@ -48,6 +48,7 @@ DocumentSelector.prototype.init = function(uicomponentId, restContext){
   documentItem.driveType = this.defaultDriveType;
   me.resetDropDownBox();
   me.renderDetails(documentItem);
+  CssIconFile.init();
 };
 
 DocumentSelector.prototype.resetDropDownBox = function() {
@@ -131,7 +132,7 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
    var nodeType = folderList[i].getAttribute("nodeType");
    var workspaceName = folderList[i].getAttribute("workspaceName");
    var canAddChild = folderList[i].getAttribute("canAddChild");
-   var uiIconFolder = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"))
+   var uiIconFolder = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(nodeType);
    var iconEl = jQuery('<i/>', {
                               'class' : uiIconFolder
                             });
@@ -143,11 +144,16 @@ DocumentSelector.prototype.renderDrives = function(documentItem) {
       'workspaceName' : workspaceName,
       'name' : name,
       'canAddChild' : canAddChild,
-      'href' : 'javascript:void(0);'      
+      'href' : 'javascript:void(0);',
+      'rel' : 'tooltip', 
+      'data-placement' : 'bottom', 
+      'data-original-title' : name
     }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
     }).append(iconEl).append(name);
     
+    link.tooltip();
+
     var item = jQuery('<li/>', {
                               'class' : 'listItem'
                             }).append(link);
@@ -191,12 +197,12 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
   }
 
 	for ( var i = 0; i < folderList.length; i++) { // render folders
-	  var folderIcon = "uiIcon16x16FolderDefault " + me.getClazzIcon(folderList[i].getAttribute("nodeType"));
 	  var jcrPath = folderList[i].getAttribute("path");
 	  var nodeType = folderList[i].getAttribute("folderType");
 	  var name = folderList[i].getAttribute("name");
 	  var title = folderList[i].getAttribute("title");
 	  var titlePath = folderList[i].getAttribute("titlePath");
+	  var folderIcon = "uiIcon16x16FolderDefault " + CssIconFile.getCssClassByType(folderList[i].getAttribute("nodeType"));
 
 	  var childFolder = folderList[i].getAttribute("currentFolder");
 	  var canRemove = folderList[i].getAttribute("canRemove");
@@ -209,7 +215,6 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
     var link = jQuery('<a/>',{
       'class' : 'Item',
       'name' : name,
-      'title' : title,
       'driveType' : driveType,
       'driveName' : driveName,
       'workspaceName' : workspaceName,
@@ -217,12 +222,15 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
       'canAddChild' : canAddChild,
       'titlePath' : titlePath,
       'jcrPath' : jcrPath,
-      'href' : 'javascript:void(0);'      
+      'href' : 'javascript:void(0);',
+      'rel':'tooltip',
+      'data-placement':'bottom',
+      'data-original-title' : title
      }).on('click', function() {
       _module.DocumentSelector.browseFolder(this);
      }).append(iconEl).append(title);
 
-    
+     link.tooltip();
      var item = jQuery('<li/>', {
                               'class' : 'listItem'
                             }).append(link);
@@ -247,7 +255,7 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
         size += '&nbsp;MB';
       }
       
-      var fileIcon = "uiIcon16x16FileDefault " + me.getClazzIcon(fileList[j].getAttribute("nodeType"));
+      var fileIcon = CssIconFile.getCssClassByNameAndType(node, nodeType);
     
     
 	    var iconEl = jQuery('<i/>', {
@@ -257,15 +265,17 @@ DocumentSelector.prototype.renderDetailsFolder = function(documentItem) {
 	    var link = jQuery('<a/>',{
 	      'class' : 'Item',
 	      'name' : node,
-	      'title' : title,
 	      'jcrPath' : jcrPath,
-	      'href' : 'javascript:void(0);'
+	      'data-file-type':nodeType,
+	      'href' : 'javascript:void(0);',
+	      'rel':'tooltip',
+	      'data-placement':'bottom',
+	      'data-original-title' : title
 	     }).on('click', function() {
 	      _module.DocumentSelector.submitSelectedFile(this);
 	     }).append(iconEl);
-	     link.html(link.html() + title);	
 
-
+	     link.tooltip().append(title);
 	     var item = jQuery('<li/>', {
 	                              'class' : 'listItem'
 	                            }).append(link);
@@ -278,12 +288,14 @@ DocumentSelector.prototype.submitSelectedFile = function(item){
   var me = _module.DocumentSelector;   
   var nodePath = jQuery(item).attr("jcrPath");
   var fileName = jQuery(item).attr("title");
+  var fileType = jQuery(item).attr("data-file-type");
     
   if (me.selectFileLink) {
     var link = me.selectFileLink.attr("href");
     var endParamIndex = link.lastIndexOf("')");
-    if (endParamIndex > 0)
-      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + encodeURI(nodePath) + "')";
+    if (endParamIndex > 0) {
+      link = link.substring(0, endParamIndex) + "&"+ me.dataId +"=" + encodeURI(nodePath) + "&filetype=" + encodeURI(fileType) +"')";
+    }
     window.location = link;
   }
   if (me.selectFile) {
@@ -522,19 +534,6 @@ function BreadCrumbs() {
   };
 };
 
-DocumentSelector.prototype.getClazzIcon = function(nodeType){
-  var strClassIcon = '';
-  if (!nodeType) {
-    strClassIcon = "uiIcon16x16Default";
-    return strClassIcon;
-  }
-  nodeType = nodeType.replace(/\//g,"").replace(/:/g, "_");  
-  strClassIcon = "uiIcon16x16" + nodeType;
-  return strClassIcon;
-};
-
-
-
 DocumentSelector.prototype.request = function(url){
   var res;
   jQuery.ajax({
@@ -546,7 +545,7 @@ DocumentSelector.prototype.request = function(url){
     }
   });
  return res;
-}
+};
 
 String.prototype.trunc = function(n, useWordBoundary){
   var toLong = this.length > n, s_ = toLong ? this.substr(0, n - 1) : this;
@@ -629,7 +628,7 @@ function UIDSUpload() {
 	};
 
 	UIDSUpload.prototype.createUploadEntryForFF = function(idoc, uploadId, isAutoUpload){
-	  var uploadAction = eXo.env.server.context + "/upload?" ;
+	  var uploadAction = _module.UIDSUpload.restContext + "/upload?" ;
 	  uploadAction += "uploadId=" + uploadId+"&action=upload" ; 
 	    
 	  var newDoctype = document.implementation.createDocumentType('html','-//W3C//DTD XHTML 1.0 Transitional//EN','http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'); 
@@ -662,15 +661,16 @@ function UIDSUpload() {
 	  var uploadIframe = jQuery("#"+uploadId+"UploadIframe",container);
 	  var uploadText = uploadIframe.title;
 	  
-	  var uploadHTML = "";  
-	  uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
-	  uploadHTML += "    <div class='BrowseDiv'>";
-	  uploadHTML += "      <a class='BrowseLink'>";
-	  uploadHTML += "        <input type='file' name='file' size='1' id='file' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
-	  uploadHTML += "      </a>";
-	  uploadHTML += "    </div>";
-	  uploadHTML += "  </form>";
-	  return uploadHTML;
+    var idFile = 'File' + new Date().getTime();
+    var uploadHTML = "";  
+    uploadHTML += "  <form id='"+uploadId+"' class='UIDSUploadForm' style='margin: 0px; padding: 0px' action='"+uploadAction+"' enctype='multipart/form-data' method='post'>";
+    uploadHTML += "    <div class='BrowseDiv'>";
+    uploadHTML += "      <a class=\"BrowseLink\" onclick=\"(function(elm) { document.getElementById('" + idFile + "').click();})(this)\">";
+    uploadHTML += "        <input type='file' name='file' size='1' style='display:none' id='" + idFile + "' class='FileHidden' value='' onchange='parent.eXo.commons.UIDSUpload.upload(this, " + uploadId + ")'/>";
+    uploadHTML += "      </a>";
+    uploadHTML += "    </div>";
+    uploadHTML += "  </form>";
+    return uploadHTML;
 	}
 
 	UIDSUpload.prototype.getStyleSheetContent = function(){
@@ -738,8 +738,8 @@ function UIDSUpload() {
 	    	if (unit == "MB") realLimit *= 1024 * 1024;
 	    	if (unit == "GB") realLimit *= 1024 * 1024 * 1024;
 	    	if (realLimit < total) {
-	  	      this.abortUpload(elementId);
-		      //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
+    		  this.abortUpload(elementId);
+    		  //var message = eXo.core.DOMUtil.findFirstChildByClass(container, "div", "LimitMessage").innerHTML ;
 		      var message = jQuery("div.LimitMessage:first-child").html();
 		      alert(message.replace("{0}", limit).replace("{1}", unit)) ;
 		      return;
@@ -892,16 +892,16 @@ function UIDSUpload() {
 
 	  var form = uploadFrame.contentWindow.document.getElementById(id);
 
-	  //var file  = DOMUtil.findDescendantById(form, "file");
-	  var file  = jQuery("#file",form);
+	  var file  = jQuery(clickEle ,form);
 	  if(file.attr("value") == null || file.attr("value") == '') return;  
-  	  jQuery(".fileNameLabel").html(file.attr("value"));
-      jQuery(".fileNameLabel").attr("title", file.attr("value"));
- 	 //var progressBarFrame = DOMUtil.findFirstDescendantByClass(container, "div", "ProgressBarFrame") ;
+	  var fileName = file.attr("value");
+	  jQuery(".fileNameLabel").html(fileName)
+                            .attr({'rel':'tooltip', 'data-placement':'bottom', 'data-original-title' : fileName})
+                            .tooltip();
+    
 	  var progressBarFrame = jQuery("div.progressBarFrame:first");
 	  progressBarFrame.show() ;  
 	  
-	  //var progressBarLabel = DOMUtil.findFirstChildByClass(progressBarFrame, "div", "ProgressBarLabel") ;
 	  var progressBarLabel = jQuery("div.pull-left percent:first-child",progressBarFrame);
 	  progressBarLabel.html("0%") ;
 	  
@@ -924,7 +924,7 @@ function UIDSUpload() {
 
 	  if(list.length == 0) {
 	    me.listUpload.push(form.id);
-	    setTimeout("eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);
+	    setTimeout("parent.window.eXo.commons.UIDSUpload.refeshProgress('" + id + "');", 1000);
 	  } else {
 	    me.listUpload.push(form.id);  
 	  }
@@ -967,4 +967,4 @@ window.eXo.commons.UIDSUpload = _module.UIDSUpload;
 
 return _module;
 
-})(jQuery,gtnbase)
+})(CssIconFile, jQuery, gtnbase)

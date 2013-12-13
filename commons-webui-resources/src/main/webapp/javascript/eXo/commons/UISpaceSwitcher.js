@@ -168,7 +168,7 @@ UISpaceSwitcher.prototype.initConfigAfterReady = function(uicomponentId, isShowP
       var spacePopup = jQuery(spaceSwitcher).find("ul.spaceChooserPopup")[0];
       var dropDownButton = jQuery(spaceSwitcher).find("div.spaceChooser")[0];
   	  if (spacePopup && dropDownButton) {
-  	    spacePopup.style.width = dropDownButton.offsetWidth + "px";
+  	    spacePopup.style.width = dropDownButton.offsetWidth-2 + "px";
   	  }
     }
   }
@@ -280,7 +280,7 @@ UISpaceSwitcher.prototype.renderSpacesFromSocialRest = function(dataList, uicomp
     me.processContainerHeight(spaces.length, container);
     jQuery("#UISpaceSwitcher_spaceTitle").parent().show();
   } else {
-    container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption noSpace' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     me.processContainerHeight(0, container);
     jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
     jQuery(".spaceChooserPopup .spaceSearchText").parent().hide();
@@ -337,7 +337,7 @@ UISpaceSwitcher.prototype.renderSpaces = function(dataList, uicomponentId, conta
     me.processContainerHeight(matchCount, container);
     jQuery("#UISpaceSwitcher_spaceTitle").parent().show();
   } else {
-    container.innerHTML = "<div class='spaceOption spaceTitle' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
+    container.innerHTML = "<div class='spaceOption noSpace' id='UISpaceSwitcher_nospace'>" + storage.noSpaceLabel + "</div>";
     jQuery("#UISpaceSwitcher_spaceTitle").parent().hide();
     me.processContainerHeight(0, container);
   }
