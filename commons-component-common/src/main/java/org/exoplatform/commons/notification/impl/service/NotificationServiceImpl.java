@@ -35,6 +35,7 @@ import org.exoplatform.commons.api.notification.service.storage.NotificationData
 import org.exoplatform.commons.api.notification.service.storage.NotificationService;
 import org.exoplatform.commons.api.notification.service.template.DigestorService;
 import org.exoplatform.commons.notification.NotificationContextFactory;
+import org.exoplatform.commons.notification.NotificationUtils;
 import org.exoplatform.commons.notification.impl.AbstractService;
 import org.exoplatform.commons.notification.impl.NotificationContextImpl;
 import org.exoplatform.commons.utils.CommonsUtils;
@@ -177,6 +178,11 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
     final boolean stats = NotificationContextFactory.getInstance().getStatistics().isStatisticsEnabled();
     
     for (UserSetting userSetting : userSettings) {
+      
+      if (NotificationUtils.isDeletedMember(userSetting.getUserId())) {
+        continue;
+      }
+      
       if (isDefault) {
         userSetting = getDefaultUserNotificationSetting(userSetting);
       }
