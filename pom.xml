@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.exoplatform.commons</groupId>
   <artifactId>commons</artifactId>
-  <version>4.1.x-commons-upgrade-gatein-3.7.x-SNAPSHOT</version>
+  <version>4.1.x-commons-translation-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Commons</name>
   <modules>
@@ -50,7 +50,7 @@
     <!-- Dependencies versions                    -->
     <!-- **************************************** -->
 
-    <org.exoplatform.depmgt.version>9-upgrade-gatein-3.7.x-SNAPSHOT</org.exoplatform.depmgt.version>
+    <org.exoplatform.depmgt.version>9-translation-SNAPSHOT</org.exoplatform.depmgt.version>
     <!-- JCR Project Dependencies -->
       <org.exoplatform.kernel.version>2.5.0-Alpha4</org.exoplatform.kernel.version>
       <org.exoplatform.core.version>2.6.0-Alpha4</org.exoplatform.core.version>
@@ -60,7 +60,7 @@
     <org.gatein.portal.version>3.7.0.Beta01</org.gatein.portal.version>
 
     <!-- Platform Project Dependencies -->
-    <org.exoplatform.platform-ui.version>4.1.x-plfui-upgrade-gatein-3.7.x-SNAPSHOT</org.exoplatform.platform-ui.version>
+    <org.exoplatform.platform-ui.version>4.1.x-plfui-translation-SNAPSHOT</org.exoplatform.platform-ui.version>
   </properties>
   <dependencyManagement>
     <!-- ### NEVER CHANGE THIS ORDER OF DEPMGT ### -->
